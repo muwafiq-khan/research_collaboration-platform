@@ -78,7 +78,7 @@ DATABASES = {
            'ENGINE': 'django.db.backends.mysql',
            'NAME': 'research_db',
            'USER': 'root',
-           'PASSWORD': 'Anjel123', 
+           'PASSWORD': 'Your_password', 
            'HOST': 'localhost',
            'PORT': '3306',
            'OPTIONS': {
@@ -123,3 +123,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
