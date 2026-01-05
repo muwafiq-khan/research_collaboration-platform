@@ -1,0 +1,142 @@
+model e ki type relationship (1:N) egula dibo,also sql commands for databse creations
+views e mysql command dibo
+from django.db import models
+
+from django.db import models
+
+# ==============================================================================
+# MODEL 1: FIELD
+# ==============================================================================
+class Field(models.Model):
+    name = models.CharField(max_length=200, primary_key=True)
+    
+    class Meta:
+        db_table = 'field'
+    
+    def __str__(self):
+        return self.name
+
+
+# ==============================================================================
+# MODEL 2: SUBFIELD
+# ==============================================================================
+class Subfield(models.Model):
+    name = models.CharField(max_length=200)
+    field = models.ForeignKey(Field, on_delete=models.CASCADE, related_name='subfields')
+    
+    class Meta:
+        db_table = 'subfield'
+    
+    def __str__(self):
+        return f"{self.name} ({self.field.name})"
+
+
+# ==============================================================================
+# MODEL 3: USER
+# ==============================================================================
+class User(models.Model):
+    USER_TYPE_CHOICES = [
+        ('researcher', 'Researcher'),
+        ('funding_agency', 'Funding Agency'),
+    ]
+    
+    name = models.CharField(max_length=200)
+    email = models.EmailField(unique=True)
+    user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='researcher')
+    institution = models.CharField(max_length=300)
+    country = models.CharField(max_length=100)
+    field = models.CharField(max_length=200)  # Simple text field for interests
+    rating = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
+    
+    class Meta:
+        db_table = 'user'
+    
+    def __str__(self):
+        return self.name
+
+
+# ==============================================================================
+# MODEL 4: PROBLEM
+# ==============================================================================
+class Problem(models.Model):
+    SEVERITY_CHOICES = [
+        ('high', 'High'),      # Red
+        ('medium', 'Medium'),  # Yellow
+        ('low', 'Low'),        # Green
+    ]
+    
+    name = models.CharField(max_length=300)
+    description = models.TextField()
+    severity = models.CharField(max_length=20, choices=SEVERITY_CHOICES, default='medium')
+    subfield = models.ForeignKey(Subfield, on_delete=models.CASCADE, related_name='problems')
+    current_work = models.TextField(blank=True)
+    done_work = models.TextField(blank=True)
+    gaps = models.TextField(blank=True)
+    
+    class Meta:
+        db_table = 'problem'
+    
+    def __str__(self):
+        return self.name
+
+
+# ==============================================================================
+# MODEL 5: PROJECT
+# ==============================================================================
+class Project(models.Model):
+    title = models.CharField(max_length=300)
+    description = models.TextField()
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_projects')
+    field = models.ForeignKey(Field, on_delete=models.CASCADE)
+    subfield = models.ForeignKey(Subfield, on_delete=models.CASCADE)
+    vacancy_status = models.BooleanField(default=True)  # True = Green (Open), False = Red (Closed)
+    collaborators = models.ManyToManyField(User, related_name='collaborated_projects', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'project'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return self.title
+
+
+# ==============================================================================
+# MODEL 6: POST
+# ==============================================================================
+class Post(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'post'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.author.name}: {self.content[:50]}"
+
+
+# ==============================================================================
+# MODEL 7: COLLABORATION REQUEST
+# ==============================================================================
+class CollaborationRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_requests')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_requests')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'collaboration_request'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.sender.name} → {self.receiver.name} ({self.status})"
