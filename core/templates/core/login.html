@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Login - Research Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">🔬 Research Collaboration Platform</h2>
+                <h5 class="text-center text-muted mb-4">Select User to Login</h5>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="user_select" class="form-label">Login as:</label>
+                        <select class="form-select form-select-lg" id="user_select" name="user_id" required>
+                            <option value="">-- Select a user --</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">
+                                {{ user.name }} ({{ user.user_type|title }}) - {{ user.institution }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Login →
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

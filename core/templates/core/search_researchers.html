@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Search Researchers{% endblock %}
+
+{% block content %}
+<h2>🔍 Search Researchers</h2>
+
+<!-- Search Filter Form -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" action="{% url 'search_researchers' %}">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="field" class="form-label">Field</label>
+                    <select class="form-select" id="field" name="field">
+                        <option value="">All Fields</option>
+                        {% for field in fields %}
+                        <option value="{{ field.name }}" {% if request.GET.field == field.name %}selected{% endif %}>
+                            {{ field.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="country" class="form-label">Country</label>
+                    <input type="text" class="form-control" id="country" name="country" 
+                           placeholder="e.g., USA" value="{{ request.GET.country }}">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="institution" class="form-label">Institution</label>
+                    <input type="text" class="form-control" id="institution" name="institution" 
+                           placeholder="e.g., MIT" value="{{ request.GET.institution }}">
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        🔍 Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results -->
+{% if searched %}
+<h4>Search Results ({{ researchers.count }} found)</h4>
+
+{% if researchers %}
+<div class="row">
+    {% for researcher in researchers %}
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title mb-1">{{ researcher.name }}</h5>
+                        <p class="text-muted small mb-2">⭐ {{ researcher.rating }}/5.0</p>
+                    </div>
+                    <span class="badge bg-info">{{ researcher.user_type|title }}</span>
+                </div>
+                
+                <p class="card-text">
+                    <strong>🏛️</strong> {{ researcher.institution }}<br>
+                    <strong>🌍</strong> {{ researcher.country }}<br>
+                    <strong>🔬</strong> {{ researcher.field }}
+                </p>
+                
+                <a href="{% url 'profile' researcher.id %}" class="btn btn-sm btn-primary">
+                    View Profile →
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-warning">
+    No researchers found matching your criteria.
+</div>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info">
+    Use the filters above to search for researchers.
+</div>
+{% endif %}
+
+{% endblock %}

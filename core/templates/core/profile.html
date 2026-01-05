@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ profile_user.name }} - Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Profile Information -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <div class="display-1 mb-3">👤</div>
+                <h3>{{ profile_user.name }}</h3>
+                <p class="text-muted">{{ profile_user.user_type|title }}</p>
+                
+                <div class="mt-3">
+                    <p><strong>⭐ Rating:</strong> {{ profile_user.rating }}/5.0</p>
+                    <p><strong>🏛️ Institution:</strong> {{ profile_user.institution }}</p>
+                    <p><strong>🌍 Country:</strong> {{ profile_user.country }}</p>
+                    <p><strong>🔬 Field:</strong> {{ profile_user.field }}</p>
+                    <p><strong>📧 Email:</strong> {{ profile_user.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="col-lg-8">
+        <h3>📁 Projects</h3>
+        
+        {% if projects %}
+        <div class="row">
+            {% for project in projects %}
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title">{{ project.title }}</h5>
+                            {% if project.vacancy_status %}
+                            <span class="badge bg-success">🟢 Open</span>
+                            {% else %}
+                            <span class="badge bg-danger">🔴 Closed</span>
+                            {% endif %}
+                        </div>
+                        
+                        <p class="card-text small text-muted">
+                            {{ project.field.name }} • {{ project.subfield.name }}
+                        </p>
+                        
+                        <p class="card-text">{{ project.description|truncatewords:20 }}</p>
+                        
+                        <div class="d-flex gap-2 mt-3">
+                            <a href="{% url 'project_detail' project.id %}" class="btn btn-sm btn-outline-primary">
+                                View Details
+                            </a>
+                            {% if project.vacancy_status and request.session.user_id != profile_user.id %}
+                            <a href="{% url 'collaborate_project' project.id %}" class="btn btn-sm btn-success">
+                                🤝 Collaborate
+                            </a>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                Collaborators: {{ project.collaborators.count }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            No projects yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

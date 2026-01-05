@@ -1,0 +1,129 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<h2>🔔 Notifications</h2>
+
+<!-- Pending Collaboration Requests -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Pending Collaboration Requests</h5>
+    </div>
+    <div class="card-body">
+        {% if pending_requests %}
+        <div class="list-group">
+            {% for request in pending_requests %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">
+                            <a href="{% url 'profile' request.sender.id %}" class="text-decoration-none">
+                                {{ request.sender.name }}
+                            </a>
+                            wants to collaborate
+                        </h6>
+                        
+                        {% if request.project %}
+                        <p class="mb-1 text-muted">
+                            On project: <strong>{{ request.project.title }}</strong>
+                        </p>
+                        {% elif request.post %}
+                        <p class="mb-1 text-muted">
+                            On your post: "{{ request.post.content|truncatewords:10 }}"
+                        </p>
+                        {% endif %}
+                        
+                        <small class="text-muted">
+                            From: {{ request.sender.institution }} • {{ request.created_at|timesince }} ago
+                        </small>
+                    </div>
+                    
+                    <div class="ms-3">
+                        <a href="{% url 'accept_collaboration' request.id %}" class="btn btn-success btn-sm">
+                            ✅ Accept
+                        </a>
+                        <a href="{% url 'reject_collaboration' request.id %}" class="btn btn-danger btn-sm">
+                            ❌ Reject
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            No pending collaboration requests.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Accepted Requests -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Accepted Collaborations</h5>
+    </div>
+    <div class="card-body">
+        {% if accepted_requests %}
+        <div class="list-group">
+            {% for request in accepted_requests %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">
+                            <a href="{% url 'profile' request.sender.id %}" class="text-decoration-none">
+                                {{ request.sender.name }}
+                            </a>
+                        </h6>
+                        
+                        {% if request.project %}
+                        <p class="mb-1 text-muted">
+                            Project: <strong>{{ request.project.title }}</strong>
+                        </p>
+                        {% endif %}
+                        
+                        <small class="text-muted">Accepted {{ request.created_at|timesince }} ago</small>
+                    </div>
+                    <span class="badge bg-success">✅ Accepted</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            No accepted collaborations yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Rejected Requests -->
+<div class="card shadow-sm">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Rejected Requests</h5>
+    </div>
+    <div class="card-body">
+        {% if rejected_requests %}
+        <div class="list-group">
+            {% for request in rejected_requests %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">{{ request.sender.name }}</h6>
+                        <small class="text-muted">Rejected {{ request.created_at|timesince }} ago</small>
+                    </div>
+                    <span class="badge bg-secondary">❌ Rejected</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            No rejected requests.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

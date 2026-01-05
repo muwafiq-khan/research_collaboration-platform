@@ -1,0 +1,113 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ problem.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Problem Details -->
+    <div class="col-lg-8">
+        <!-- Problem Header -->
+        <div class="card shadow-sm mb-4 
+                    {% if problem.severity == 'high' %}border-danger{% endif %}
+                    {% if problem.severity == 'medium' %}border-warning{% endif %}
+                    {% if problem.severity == 'low' %}border-success{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h2 class="card-title">{{ problem.name }}</h2>
+                    {% if problem.severity == 'high' %}
+                    <span class="badge bg-danger fs-5">🔴 HIGH SEVERITY</span>
+                    {% elif problem.severity == 'medium' %}
+                    <span class="badge bg-warning text-dark fs-5">🟡 MEDIUM SEVERITY</span>
+                    {% else %}
+                    <span class="badge bg-success fs-5">🟢 LOW SEVERITY</span>
+                    {% endif %}
+                </div>
+                
+                <p class="text-muted">
+                    <strong>Field:</strong> {{ problem.subfield.field.name }} • 
+                    <strong>Subfield:</strong> {{ problem.subfield.name }}
+                </p>
+                
+                <hr>
+                
+                <h5>📋 Description</h5>
+                <p>{{ problem.description }}</p>
+                
+                <hr>
+                
+                <h5>🔬 Current Work Being Done</h5>
+                <p>{{ problem.current_work|default:"No ongoing work documented yet." }}</p>
+                
+                <hr>
+                
+                <h5>✅ Completed Work</h5>
+                <p>{{ problem.done_work|default:"No completed work documented yet." }}</p>
+                
+                <hr>
+                
+                <h5>❌ Research Gaps</h5>
+                <p>{{ problem.gaps|default:"No research gaps identified yet." }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Researchers Working on This -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">👥 Researchers Working on This</h5>
+                
+                {% if working_researchers %}
+                <div class="list-group list-group-flush">
+                    {% for researcher in working_researchers %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ researcher.name }}</h6>
+                                <small class="text-muted">{{ researcher.institution }}</small>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <a href="{% url 'profile' researcher.id %}" class="btn btn-sm btn-outline-primary">
+                                View Profile
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No researchers currently working on this problem.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Related Projects -->
+        {% if related_projects %}
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+                <h5 class="card-title">📁 Related Projects</h5>
+                <div class="list-group list-group-flush">
+                    {% for project in related_projects %}
+                    <div class="list-group-item px-0">
+                        <h6 class="mb-1">{{ project.title }}</h6>
+                        <small class="text-muted">by {{ project.owner.name }}</small>
+                        <div class="mt-2">
+                            <a href="{% url 'profile' project.owner.id %}" class="btn btn-sm btn-outline-primary">
+                                View Project
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'search_problems' %}" class="btn btn-secondary">
+        ← Back to Search
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Search Problems{% endblock %}
+
+{% block content %}
+<h2>⚠️ Search Research Problems</h2>
+
+<!-- Search Filter Form -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" action="{% url 'search_problems' %}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="field" class="form-label">Field</label>
+                    <select class="form-select" id="field" name="field" required>
+                        <option value="">Select Field</option>
+                        {% for field in fields %}
+                        <option value="{{ field.name }}" {% if request.GET.field == field.name %}selected{% endif %}>
+                            {{ field.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="subfield" class="form-label">Subfield</label>
+                    <select class="form-select" id="subfield" name="subfield">
+                        <option value="">All Subfields</option>
+                        {% for subfield in subfields %}
+                        <option value="{{ subfield.id }}" {% if request.GET.subfield == subfield.id|stringformat:"s" %}selected{% endif %}>
+                            {{ subfield.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        🔍 Search Problems
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results -->
+{% if searched %}
+<h4>Research Problems ({{ problems.count }} found)</h4>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex gap-2">
+            <span class="badge bg-danger">🔴 High Severity</span>
+            <span class="badge bg-warning text-dark">🟡 Medium Severity</span>
+            <span class="badge bg-success">🟢 Low Severity</span>
+        </div>
+    </div>
+</div>
+
+{% if problems %}
+<div class="row">
+    {% for problem in problems %}
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm h-100 
+                    {% if problem.severity == 'high' %}border-danger{% endif %}
+                    {% if problem.severity == 'medium' %}border-warning{% endif %}
+                    {% if problem.severity == 'low' %}border-success{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title">{{ problem.name }}</h5>
+                    {% if problem.severity == 'high' %}
+                    <span class="badge bg-danger">🔴 HIGH</span>
+                    {% elif problem.severity == 'medium' %}
+                    <span class="badge bg-warning text-dark">🟡 MEDIUM</span>
+                    {% else %}
+                    <span class="badge bg-success">🟢 LOW</span>
+                    {% endif %}
+                </div>
+                
+                <p class="card-text small text-muted mb-2">
+                    {{ problem.subfield.field.name }} • {{ problem.subfield.name }}
+                </p>
+                
+                <p class="card-text">{{ problem.description|truncatewords:25 }}</p>
+                
+                <a href="{% url 'problem_detail' problem.id %}" class="btn btn-sm btn-outline-primary">
+                    View Details →
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-warning">
+    No problems found matching your criteria.
+</div>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info">
+    Select a field and subfield to search for research problems.
+</div>
+{% endif %}
+
+{% endblock %}

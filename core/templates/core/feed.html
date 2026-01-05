@@ -1,0 +1,91 @@
+{% extends 'core/base.html' %}
+
+{% block title %}World Feed{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Feed Column -->
+    <div class="col-lg-8">
+        <h2>🌍 World Feed</h2>
+        
+        <!-- Create Post Form -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">What's on your research mind?</h5>
+                <form method="POST" action="{% url 'create_post' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea class="form-control" name="content" rows="3" 
+                                  placeholder="Share your research ideas, questions, or updates..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        📝 Post
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Posts List -->
+        {% for post in posts %}
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title mb-1">
+                            <a href="{% url 'profile' post.author.id %}" class="text-decoration-none">
+                                {{ post.author.name }}
+                            </a>
+                        </h5>
+                        <p class="text-muted small">{{ post.author.institution }} • {{ post.created_at|timesince }} ago</p>
+                    </div>
+                </div>
+                
+                <p class="card-text mt-3">{{ post.content }}</p>
+                
+                <div class="d-flex gap-2 mt-3">
+                    <a href="{% url 'collaborate_post' post.id %}" class="btn btn-sm btn-outline-primary">
+                        🤝 Collaborate
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                        💬 Comment
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                        👍 Like
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            No posts yet. Be the first to share something!
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Quick Links</h5>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'search_researchers' %}" class="btn btn-outline-primary">
+                        🔍 Search Researchers
+                    </a>
+                    <a href="{% url 'search_problems' %}" class="btn btn-outline-warning">
+                        ⚠️ Search Problems
+                    </a>
+                    <a href="{% url 'create_project' %}" class="btn btn-outline-success">
+                        📁 Create Project
+                    </a>
+                    <a href="{% url 'notifications' %}" class="btn btn-outline-info">
+                        🔔 Notifications
+                        {% if pending_requests_count > 0 %}
+                        <span class="badge bg-danger">{{ pending_requests_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
