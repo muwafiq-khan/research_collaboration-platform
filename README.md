@@ -49,7 +49,7 @@ Open: http://127.0.0.1:8000/
 
 ## Team
 - Muwafiq Khan Josh (23201414)
-- Ahmed Rahman (23201501)
-- Sadia Akter (23201645)
+-kafi shan
+-Arshan
 
 CSE370 Database Systems Project - Fall 2025
